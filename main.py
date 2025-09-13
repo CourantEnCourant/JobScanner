@@ -8,6 +8,11 @@ from dotenv import load_dotenv
 from io import StringIO
 import logging
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
 # Load environment variables from .env file
 load_dotenv()
 

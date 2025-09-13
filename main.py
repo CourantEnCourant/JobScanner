@@ -91,7 +91,7 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
                     result += f"   Description: {job_description}\n"
                 result += f"   Apply: {job_url}\n\n\n"
 
-            logging.info(f"{result}")
+            logging.debug(f"{result}")
             return result
 
     except httpx.HTTPStatusError as e:
@@ -117,14 +117,14 @@ def get_more_job_details(employer_name:str, result:str) -> str:
     if not result:
         return "Error: No job search results available. Please perform a job search first."
     else:
-        logging.info(f"Scraping job details for employer: {employer_name} from results.")
+        logging.debug(f"Scraping job details for employer: {employer_name} from results.")
     lines = result.split("\n\n\n")
 
     for line in lines:
         if employer_name.lower() in line.lower():
             # return the link after "Apply:"
             apply_link = line.split("Apply:")[-1].strip()
-            logging.info(f"Found job details for {employer_name}: {apply_link}")
+            logging.debug(f"Found job details for {employer_name}: {apply_link}")
             return f"Job details for {employer_name}:\n at: {apply_link}"
 
     return f"No job details found for employer: '{employer_name}'"

@@ -1,7 +1,12 @@
-import fastmcp
+from fastmcp import FastMCP
 
-def main():
-    print("Hello World!")
+mcp = FastMCP("Demo 🚀")
+
+@mcp.tool
+def greet():
+    """Official greeting from Mistral"""
+    return "Hello welcome to Mistral Hackathon"
 
 if __name__ == "__main__":
-    main()
+    print("Server starting...")
+    mcp.run()

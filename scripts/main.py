@@ -9,4 +9,4 @@ def greet():
 
 if __name__ == "__main__":
     print("Server starting...")
-    mcp.run()
+    mcp.run(transport="streamable-http")

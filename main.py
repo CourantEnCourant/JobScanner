@@ -86,7 +86,7 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
                 job_description = job_description.replace("\n", " ").strip()
                 job_url = job.get("job_apply_link", "No URL available")
 
-                result += f"{i}. **{job_title}** at {employer_name}\n"
+                result += f"{i}. {job_title} at {employer_name}\n"
                 result += f"   Location: {location_str}\n"
                 if job_description:
                     result += f"   Description: {job_description}\n"

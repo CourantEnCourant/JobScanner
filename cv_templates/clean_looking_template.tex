@@ -1,0 +1,135 @@
+\documentclass[12pt]{article}
+\usepackage[english]{babel}
+\usepackage{cmbright}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{fontawesome5}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage[sf]{libertine}
+\usepackage{microtype}
+\usepackage{paracol}
+\usepackage{supertabular}
+\usepackage{titlesec}
+\hypersetup{colorlinks, urlcolor=black, linkcolor=black}
+
+% Geometry
+\geometry{hmargin=1.75cm, vmargin=2.5cm}
+\columnratio{0.65, 0.35}
+\setlength\columnsep{0.05\textwidth}
+\setlength\parindent{0pt}
+\setlength{\smallskipamount}{8pt plus 3pt minus 3pt}
+\setlength{\medskipamount}{16pt plus 6pt minus 6pt}
+\setlength{\bigskipamount}{24pt plus 8pt minus 8pt}
+
+% Style
+\pagestyle{empty}
+\titleformat{\section}{\scshape\LARGE\raggedright}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{\bigskipamount}{\smallskipamount}
+\newcommand{\heading}[2]{\centering{\sffamily\Huge #1}\\\smallskip{\large{#2}}}
+\newcommand{\entry}[4]{{{\textbf{#1}}} \hfill #3 \\ #2 \hfill #4}
+\newcommand{\tableentry}[3]{\textsc{#1} & #2\expandafter\ifstrequal\expandafter{#3}{}{\\}{\\[6pt]}}
+
+\begin{document}
+
+\vspace*{\fill}
+
+\begin{paracol}{2}
+
+% Name & headline
+\heading{John Doe}{Lorem ipsum dolor sit amet, \\ consectetur adipiscing elit.}
+
+\switchcolumn
+
+% Identity card
+\vspace{0.01\textheight}
+\begin{supertabular}{ll}
+  \footnotesize\faPhone & +33 1 23 45 67 89 \\
+  \footnotesize\faEnvelope & \href{mailto:john.doe@gmail.com}{john.doe@gmail.com} \\
+  \footnotesize\faLinkedin & \href{https://www.linkedin.com/in/johndoe}{linkedin.com/in/johndoe} \\
+\end{supertabular}
+
+\bigskip
+\switchcolumn*
+
+\section{education}
+
+\entry{Second University}{Degree, Major}{City, Country}{2022 -- 2024}
+\begin{itemize}[noitemsep,leftmargin=3.5mm,rightmargin=0mm,topsep=6pt]
+  \item Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  \item Pellentesque sit amet mauris malesuada, mattis odio nec.
+  \item Praesent lobortis ac urna a tristique.
+\end{itemize}
+
+\medskip
+
+\entry{First University}{Degree, Major}{City, Country}{2019 -- 2022}
+
+\switchcolumn
+
+\section{skills}
+\begin{supertabular}{rl}
+  \tableentry{\footnotesize\faCode}{Python \textperiodcentered{} C/C++ \textperiodcentered{} Arduino}{}
+  \tableentry{}{TensorFlow \textperiodcentered{} Git \textperiodcentered{} Linux}{}
+  \tableentry{}{}{}
+
+  \tableentry{\footnotesize\faLanguage}{English \textperiodcentered{} proficient}{}
+  \tableentry{}{French \textperiodcentered{} native}{}
+  \tableentry{}{Spanish \textperiodcentered{} advanced}{}
+  \tableentry{}{Arabic \textperiodcentered{} beginner}{}
+\end{supertabular}
+
+\switchcolumn*
+
+\section{experience}
+
+\entry{Third Company}{Third Role}{City, Country}{2023 (3 months)}
+\begin{itemize}[noitemsep,leftmargin=3.5mm,rightmargin=0mm,topsep=6pt]
+  \item Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  \item Pellentesque sit amet mauris malesuada, mattis odio nec.
+  \item Praesent lobortis ac urna a tristique.
+\end{itemize}
+
+\medskip
+
+\entry{Second Company}{Second Role}{City, Country}{2022 -- 2023}
+\begin{itemize}[noitemsep,leftmargin=3.5mm,rightmargin=0mm,topsep=6pt]
+  \item Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  \item Pellentesque sit amet mauris malesuada, mattis odio nec.
+  \item Praesent lobortis ac urna a tristique.
+\end{itemize}
+
+\medskip
+
+\entry{First Company}{First Role}{City, Country}{2021 -- 2022}
+\begin{itemize}[noitemsep,leftmargin=3.5mm,rightmargin=0mm,topsep=6pt]
+  \item Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  \item Pellentesque sit amet mauris malesuada, mattis odio nec.
+  \item Praesent lobortis ac urna a tristique.
+\end{itemize}
+
+\switchcolumn
+
+\section{other interests}
+\begin{supertabular}{rl}
+  \tableentry{domain}{First Passion}{}
+  \tableentry{}{Second Passion}{spaceafter}
+  \tableentry{domain}{First Passion}{}
+  \tableentry{}{Second Passion}{spaceafter}
+\end{supertabular}
+
+\bigskip
+
+\section{awards}
+\begin{supertabular}{rl}
+  \tableentry{2018}{\textbf{Top-ranked team}}{}
+  \tableentry{}{Some Contest}{spaceafter}
+  \tableentry{2016}{\textbf{Bronze Medal}}{}
+  \tableentry{}{Some Contest}{spaceafter}
+\end{supertabular}
+
+\end{paracol}
+
+\vspace*{\fill}
+
+\end{document}

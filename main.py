@@ -11,7 +11,7 @@ from io import StringIO
 load_dotenv()
 
 # Initialize FastMCP server
-mcp = FastMCP("jobscanner")
+mcp = FastMCP("jobscanner", port=3000, stateless_http=True, debug=True)
 
 # Global variables
 result = ""

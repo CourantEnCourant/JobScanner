@@ -9,4 +9,7 @@ dependencies = [
     "httpx>=0.28.1",
     "mcp[cli]>=1.14.0",
     "stagehand-py>=0.3.10",
+    "boto3>=1.40.30",
+    "fastmcp>=2.12.3",
+    "pylatex>=1.4.2",
 ]

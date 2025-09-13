@@ -1,5 +1,4 @@
 # JobScanner
-<<<<<<< HEAD
 
 Job dating app for Mistral MCP Hackathon
 
@@ -24,6 +23,3 @@ The MCP server provides tools for:
 ```bash
 python main.py
 ```
-=======
-Job dating app for Mistral MCP Hackathon
->>>>>>> origin/dev-liza

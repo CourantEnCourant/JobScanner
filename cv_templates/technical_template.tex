@@ -1,0 +1,158 @@
+%------------------------
+% Ethan's Résumé Template
+% Author: necusjz
+% License: CC-BY-4.0
+%------------------------
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{ragged2e}
+\usepackage{etoolbox}
+\usepackage{tikz}
+\input{glyphtounicode}
+
+% font options
+\usepackage{newpxtext}
+\linespread{1.05}  % palladio needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\pagestyle{fancy}
+\fancyhf{}  % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+\setlength{\footskip}{5pt}
+
+% sections formatting
+\titleformat{\section}{
+  \vspace{-2pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule\vspace{-5pt}]
+
+% ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+% custom commands
+\newcommand{\cvitem}[1]{
+  \item\small{
+    {#1\vspace{-2pt}}
+  }
+}
+
+\newcommand{\cvheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \small#3 & \small #4 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\cvheadingstart}{\begin{itemize}[leftmargin=0in, label={}]}
+\newcommand{\cvheadingend}{\end{itemize}}
+\newcommand{\cvitemstart}{\begin{itemize}[label=\textopenbullet]\justifying}
+\newcommand{\cvitemend}{\end{itemize}\vspace{-5pt}}
+
+\newcommand{\cvskill}[2]{
+  \textcolor{black}{\textbf{#1}}\hfill
+  \foreach \x in {1,...,5}{%
+    \space{\ifnumgreater{\x}{#2}{\color{black!80!white!20}}{\color{black}}\faSquare}}\par%
+  \vspace{-2pt}
+}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\footnotesize$\bullet$}}$}
+
+\begin{document}
+
+% contact information
+\begin{center}
+  \textbf{\LARGE\scshape Ethan Yang} \\
+  \vspace{1pt}\small
+  \href{mailto:}{Email}
+  $\ \diamond\ $ 
+  Phone
+  $\ \diamond\ $
+  \href{https://github.com/}{GitHub}
+  $\ \diamond\ $
+  \href{https://www.linkedin.com/}{LinkedIn}
+\end{center}
+
+\section{Professional Experience}
+\cvheadingstart
+  \cvheading
+    {Company}{City, State}
+    {Title}{09/2021 - Present}
+  \cvitemstart
+    \cvitem{Description}
+    \cvitem{Description}
+    \cvitem{Description}
+    \cvitem{Description}
+  \cvitemend
+
+  \cvheading
+    {Company}{City, State}
+    {Title}{06/2019 - 09/2021}
+  \cvitemstart
+    \cvitem{Description}
+    \cvitem{Description}
+  \cvitemend
+
+  \cvheading
+    {Company}{City, State}
+    {Title}{12/2018 - 06/2019}
+  \cvitemstart
+    \cvitem{Description}
+  \cvitemend
+\cvheadingend
+
+\section{Education}
+\cvheadingstart
+  \cvheading
+    {School}{City, State}
+    {Degree, Field}{09/2016 - 11/2018}
+  \cvheading
+    {School}{City, State}
+    {Degree, Field}{09/2010 - 07/2014}
+\cvheadingend
+
+\section{Technical Skills}
+\cvskill{Skill}{4}
+\cvskill{Skill}{3}
+\cvskill{Skill}{3}
+\cvskill{Skill}{2}
+\vspace{-5pt}
+
+\section{Misc.}
+\cvheadingstart
+\item
+\cvitemstart
+  \cvitem{Licenses \& certifications}
+  \cvitem{Volunteering}
+  \cvitem{\href{https://arxiv.org/}{Publications}}
+  \cvitem{\href{https://patents.google.com/}{Patents}}
+\cvitemend
+\cvheadingend
+
+\end{document}

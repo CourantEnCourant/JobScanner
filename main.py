@@ -194,12 +194,25 @@ You MUST open this view on the canvas tool in an iframe for this LINK: {live_vie
 WRITE THIS CODE IN THE CANVAS TOOL:
 
 <iframe
-src="{live_view_link}"
-sandbox="allow-same-origin allow-scripts"
-allow="clipboard-read; clipboard-write"
-style="width: 100%; height: 80vh; border: none; pointer-events: none;"
+    id="browserbase-iframe"
+    src="{live_view_link}"
+    sandbox="allow-same-origin allow-scripts"
+    allow="clipboard-read; clipboard-write"
+    style="width: 100%; height: 80vh; border: none; pointer-events: none;"
 />
+<div id="browserbase-iframe-fallback" style="display: none;">
+    The process of filling the form finished, you can check the replay <a href="{browser_url}">here</a>
 </div>
+<script>
+console.log("Browserbase iframe fallback script loaded");
+window.addEventListener("message", function (event) {{
+    if (event.data === "browserbase-disconnected") {{
+        console.log("Message received from iframe:", event.data);
+        document.getElementById("browserbase-iframe").style.display = "none";
+        document.getElementById("browserbase-iframe-fallback").style.display = "block";
+    }}
+}});
+</script>
 
 YOUR TEXT RESPONSE MUST MENTION : {browser_url}
 """
@@ -236,11 +249,15 @@ async def _fill_form_background(stagehand: Stagehand, url: str):
         print(f"Resume field input: {resume_field_input}")
         first_resume_field_input = resume_field_input[0]
         print(f"First resume field input: {first_resume_field_input}")
-        await page.set_input_files(
-            first_resume_field_input.selector,
-            str(temp_file_path)
-        )
-        print("File uploaded successfully")
+
+        # if xpath include "input":
+        if ("input" in first_resume_field_input.selector):
+            await page.set_input_files(
+                first_resume_field_input.selector,
+                str(temp_file_path)
+            )
+            print("File uploaded successfully")
+
         actions = await page.observe(f"apply for the job offer with dummy data")
         print(f"Actions: {actions}")
         # Limit to first 5 actions to not complete the form on purpose

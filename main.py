@@ -7,8 +7,23 @@ from pathlib import Path
 mcp = FastMCP("Echo Server", port=3000, stateless_http=True, debug=True)
 
 
-@mcp.tool(description="Upload a .tex file on aws and return a overleaf link for compilation")
-def upload_tex_send_compile_with_overleaf(file_path: str) -> str:
+@mcp.tool(description="List all existing cv templates")
+async def list_templates() -> list[str] | str:
+    try:
+        template_dir = Path(__file__).parent / "cv_templates"
+        return [str(p) for p in template_dir.glob("*.tex")]
+    except Exception as e:
+        return f"An error occurred: {e}"
+
+
+@mcp.tool(description="Read a local .tex file for cv template")
+async def read_template(template_path: str) -> str:
+    with open(template_path) as f:
+        return f.read()
+
+
+@mcp.tool(description="Upload a .tex file on aws and return a overleaf link for manual compilation")
+async def upload_tex_then_compile_with_overleaf(file_path: str) -> str:
     bucket_name = "mistral-mcp-hackathon"
     local_file = file_path
     object_name = Path(local_file).name
@@ -23,13 +38,14 @@ def upload_tex_send_compile_with_overleaf(file_path: str) -> str:
 
 
 @mcp.tool(description="Create a .tex file from the given LaTeX source and save it to ./cv/cv.tex")
-def create_tex(latex: str) -> str:
+async def create_tex(latex: str) -> str:
     try:
         with open(Path("./cv/cv.tex"), "w") as f:
             f.write(latex)
         return "Tex created successfully"
     except Exception as e:
         return f"Tex creation failed: {e}"
+
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http")

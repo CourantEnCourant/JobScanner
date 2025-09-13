@@ -1,6 +1,6 @@
 from fastmcp import FastMCP
 
-mcp = FastMCP("Demo 🚀")
+mcp = FastMCP("Echo Server", port=3000, stateless_http=True, debug=True)
 
 @mcp.tool
 def greet():

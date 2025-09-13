@@ -1,14 +1,7 @@
 [project]
 name = "jobscanner"
 version = "0.1.0"
-<<<<<<< HEAD
 description = "Hackathon 2025"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-    "fastmcp>=2.12.3",
-=======
-description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -19,5 +12,4 @@ dependencies = [
     "boto3>=1.40.30",
     "fastmcp>=2.12.3",
     "pylatex>=1.4.2",
->>>>>>> origin/main
 ]

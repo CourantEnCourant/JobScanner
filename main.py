@@ -5,12 +5,19 @@ from typing import Any
 import httpx
 import os
 from mcp.server.fastmcp import FastMCP
+from dotenv import load_dotenv
+from stagehand import StagehandConfig, Stagehand
+import boto3
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize FastMCP server
-mcp = FastMCP("jobscanner")
+mcp = FastMCP("jobscanner", port=3000, stateless_http=True, debug=True)
 
-entries = []
-
+# Global variables
+result = ""
+# entries = []
 
 @mcp.tool()
 async def search_jobs(query1: str, query2: str = "", query3: str="", location: str = "", country: str = "us", date_posted: str = "all", limit: int = 10) -> str:
@@ -79,6 +86,7 @@ async def search_jobs(query1: str, query2: str = "", query3: str="", location: s
                 jobs = jobs[:limit]
 
                 # Format results
+                global result
                 result = f"Found {len(jobs)} job(s) matching '{query}'"
                 if location:
                     result += f" in '{location}'"
@@ -93,7 +101,7 @@ async def search_jobs(query1: str, query2: str = "", query3: str="", location: s
                     job_description = job.get("job_description", "")[:200] + "..." if len(job.get("job_description", "")) > 200 else job.get("job_description", "")
                     job_url = job.get("job_apply_link", "No URL available")
 
-                    result += f"{i}. **{job_title}** at {employer_name}\n"
+                    result += f"{i}. {job_title} at {employer_name}\n"
                     result += f"   Location: {location_str}\n"
                     if job_description:
                         result += f"   Description: {job_description}\n"
@@ -107,6 +115,34 @@ async def search_jobs(query1: str, query2: str = "", query3: str="", location: s
     result += "If the query was too broad, consider using more specific keywords or adding a location. Also ask the user about their preferences or their personal background to refine the search."
     return result
 
+@mcp.tool()
+def get_more_job_details(employer_name:str, result:str) -> str:
+    """
+    When user asks about a specific employer, must use this tool and must open the apply link.
+    Then you must open this page, scrape its content from the link, and summarize it to return to the user.
+    Parameters:
+    - employer_name: The name of the employer to get job details for.
+    - result: The job search results string from the previous search_jobs tool.
+    Returns: A string containing detailed job information for the specified employer.
+    Example: get_more_job_details("Google", result)
+    Note: Ensure to handle cases where the employer is not found in the results.
+    """
+    if not result:
+        return "Error: No job search results available. Please perform a job search first."
+    else:
+        print(f"Scraping job details for employer: {employer_name} from results.")
+
+    lines = result.split("\n\n")
+    for line in lines:
+        if employer_name.lower() in line.lower():
+            # return the link after "Apply:"
+            apply_link = line.split("   Apply: ")[-1].split("\n")[0]
+            if apply_link:
+                return f"For more details about jobs at {employer_name}, open link: {apply_link}"
+            else:
+                return f"No application link found for employer: '{employer_name}'"
+
+    return f"No job details found for employer: '{employer_name}'"
 
 @mcp.tool()
 async def fetch_url(url: str) -> Any:
@@ -132,22 +168,15 @@ async def main_prompt(user_input: str) -> str:
     return prompt
 
 
-@mcp.tool()
-async def add_job_application_entry(company_name:str, job_title:str) -> str:
-    entries.append((company_name, job_title))
-    return "Job application entry added successfully"
+# @mcp.tool()
+# async def add_job_application_entry(company_name:str, job_title:str) -> str:
+#     entries.append((company_name, job_title))
+#     return "Job application entry added successfully"
 
-@mcp.tool()
-async def get_job_application_entries() -> str:
-    """Get all job application entries as csv"""
-    return "company_name,job_title\n" + "\n".join([f"{company_name},{job_title}" for company_name, job_title in entries])
-
-
-
-from stagehand import StagehandConfig, Stagehand
-from dotenv import load_dotenv
-
-load_dotenv()
+# @mcp.tool()
+# async def get_job_application_entries() -> str:
+#     """Get all job application entries as csv"""
+#     return "company_name,job_title\n" + "\n".join([f"{company_name},{job_title}" for company_name, job_title in entries])
 
 @mcp.tool()
 async def fill_application_form(url:str):
@@ -160,7 +189,7 @@ async def fill_application_form(url:str):
         api_key=os.getenv("BROWSERBASE_API_KEY"),
         project_id=os.getenv("BROWSERBASE_PROJECT_ID"),
         model_name="google/gemini-2.5-flash-preview-05-20",
-        model_api_key=os.getenv("MODEL_API_KEY"),
+        model_api_key=os.getenv("MISTRALAPI_KEY"),
     )
 
     stagehand = Stagehand(config)
@@ -256,7 +285,7 @@ async def read_user_info() -> str:
             return f.read()
         except Exception as e:
             return f"Reading failed with following exception: {e}"
-import pathlib
+
 
 @mcp.tool(description="List all existing cv templates")
 async def list_templates() -> list[str] | str:
@@ -273,7 +302,6 @@ async def read_template(template_path: str) -> str:
         return f.read()
 
 
-import boto3
 
 @mcp.tool(description="Upload a .tex file on aws and return a overleaf link for manual compilation")
 async def upload_tex_then_compile_with_overleaf(file_path: str) -> str:
@@ -298,32 +326,6 @@ async def create_tex(latex: str) -> str:
         return "Tex created successfully"
     except Exception as e:
         return f"Tex creation failed: {e}"
-
-
-
-
-
-if __name__ == "__main__":
-    # Initialize and run the server
-    mcp.run(transport='streamable-http')
-from typing import Any, List, Dict
-import httpx
-import os
-import csv
-import json
-from mcp.server.fastmcp import FastMCP
-from dotenv import load_dotenv
-from io import StringIO
-import logging
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Initialize FastMCP server
-mcp = FastMCP("jobscanner", port=3000, stateless_http=True, debug=True)
-
-# Global variables
-result = ""
 
 @mcp.tool()
 async def search_jobs(query: str, location: str = "", country: str = "us", date_posted: str = "all", limit: int = 10) -> str:
@@ -409,34 +411,7 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
         return f"Error searching jobs: {str(e)}"
 
 
-@mcp.tool()
-def get_more_job_details(employer_name:str, result:str) -> str:
-    """
-    When user asks about a specific employer, must use this tool and must open the apply link.
-    Then you must open this page, scrape its content from the link, and summarize it to return to the user.
-    Parameters:
-    - employer_name: The name of the employer to get job details for.
-    - result: The job search results string from the previous search_jobs tool.
-    Returns: A string containing detailed job information for the specified employer.
-    Example: get_more_job_details("Google", result)
-    Note: Ensure to handle cases where the employer is not found in the results.
-    """
-    if not result:
-        return "Error: No job search results available. Please perform a job search first."
-    else:
-        print(f"Scraping job details for employer: {employer_name} from results.")
 
-    lines = result.split("\n\n")
-    for line in lines:
-        if employer_name.lower() in line.lower():
-            # return the link after "Apply:"
-            apply_link = line.split("   Apply: ")[-1].split("\n")[0]
-            if apply_link:
-                return f"For more details about jobs at {employer_name}, open link: {apply_link}"
-            else:
-                return f"No application link found for employer: '{employer_name}'"
-
-    return f"No job details found for employer: '{employer_name}'"
 
 if __name__ == "__main__":
     # Initialize and run the server

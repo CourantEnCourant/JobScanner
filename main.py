@@ -88,75 +88,30 @@ async def get_job_application_entries() -> str:
     return "company_name,job_title\n" + "\n".join([f"{company_name},{job_title}" for company_name, job_title in entries])
 
 
-
-from stagehand import StagehandConfig, Stagehand
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+from browser_use import Agent, ChatGoogle
+import asyncio
+
+async def run_agent(agent:Agent):
+    await agent.run(max_steps=5) # 5 for now so we on purpose do not loop forever
+
 
 @mcp.tool()
 async def fill_applcation_form(url:str):
     """
     Fill the application form for the given URL
     """
-      # Create configuration - always use BROWSERBASE mode
-    config = StagehandConfig(
-        env="BROWSERBASE",
-        api_key=os.getenv("BROWSERBASE_API_KEY"),
-        project_id=os.getenv("BROWSERBASE_PROJECT_ID"),
-        model_name="google/gemini-2.5-flash-preview-05-20",
-        model_api_key=os.getenv("MODEL_API_KEY"),
-    )
-
-    stagehand = Stagehand(config)
-
-    print("\nInitializing 🤘 Stagehand...")
-    # Initialize Stagehand
-    await stagehand.init()
-
-    print(f"Stagehand environment: {stagehand.env}")
-
-    # Always return the browser URL early since we're always in BROWSERBASE mode
-    browser_url = f"https://www.browserbase.com/sessions/{stagehand.session_id}"
-    print(f"🌐 View your live browser: {browser_url}")
-
-    # Start the background task for filling the form
-    asyncio.create_task(_fill_form_background(stagehand, url))
-    return f"Browser session started. View live browser: {browser_url}. Form filling continues in background."
-
-
-async def _fill_form_background(stagehand: Stagehand, url: str):
-    """Background task to fill the application form"""
-    try:
-        page = stagehand.page
-
-        print(f"Going to {url}")
-        await page.goto("https://jobs.lever.co/mistral/7894fd8a-ffc9-4c89-87f0-f8a7b695cf01/apply")
-
-        print(f"Page: {page}")
-        actions = await page.observe("apply for the job offer with dummy data, we are in france, feel all the fields in the form")
-        print(f"Actions: {actions}")
-        for action in actions:
-            acted = await page.act(action)
-            print(f"Acted: {acted}")
-
-
-
-        print("\nClosing 🤘 Stagehand...")
-        await stagehand.close()
-
-        print("Background form filling completed successfully")
-
-    except Exception as e:
-        print(f"Error in background form filling: {str(e)}")
-        try:
-            await stagehand.close()
-        except:
-            pass
-
-
-
+    llm = ChatGoogle(model="gemini-2.5-flash")
+    task = "Fill the form from ttps://jobs.lever.co/mistral/7894fd8a-ffc9-4c89-87f0-f8a7b695cf01/apply with file /Users/titouv/Developer/JobScanner/resume.pdf, start with the file field the others after"
+    agent = Agent(task=task, llm=llm,available_file_paths=["/Users/titouv/Developer/JobScanner/resume.pdf"])
+    asyncio.create_task(run_agent(agent))
+    return agent.task_id
 
 if __name__ == "__main__":
+
     # Initialize and run the server
     mcp.run(transport='streamable-http')

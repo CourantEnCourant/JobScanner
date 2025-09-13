@@ -105,9 +105,11 @@ async def fill_applcation_form(url:str):
     """
     Fill the application form for the given URL
     """
-    llm = ChatGoogle(model="gemini-2.5-flash")
-    task = "Fill the form from ttps://jobs.lever.co/mistral/7894fd8a-ffc9-4c89-87f0-f8a7b695cf01/apply with file /Users/titouv/Developer/JobScanner/resume.pdf, start with the file field the others after"
-    agent = Agent(task=task, llm=llm,available_file_paths=["/Users/titouv/Developer/JobScanner/resume.pdf"])
+    llm = ChatGoogle(model="gemini-2.5-flash") # requires GEMINI_API_KEY
+    file_path = "/Users/titouv/Developer/JobScanner/resume.pdf"
+    url = "https://jobs.lever.co/mistral/7894fd8a-ffc9-4c89-87f0-f8a7b695cf01/apply" # harcoded for now
+    task = f"Fill the form from {url} with file {file_path}, start with the file field the others after"
+    agent = Agent(task=task, llm=llm,available_file_paths=[file_path])
     asyncio.create_task(run_agent(agent))
     return agent.task_id
 

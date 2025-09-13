@@ -7,7 +7,7 @@ import os
 from mcp.server.fastmcp import FastMCP
 
 # Initialize FastMCP server
-mcp = FastMCP("jobscanner")
+mcp = FastMCP("jobscanner", port=3000)
 
 entries = []
 

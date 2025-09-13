@@ -1,4 +1,6 @@
 import asyncio
+import pathlib
+import tempfile
 from typing import Any
 import httpx
 import os
@@ -134,12 +136,39 @@ async def _fill_form_background(stagehand: Stagehand, url: str):
         await page.goto("https://jobs.lever.co/mistral/7894fd8a-ffc9-4c89-87f0-f8a7b695cf01/apply")
 
         print(f"Page: {page}")
-        actions = await page.observe("apply for the job offer with dummy data, we are in france, feel all the fields in the form")
+
+        ## Download file from URL
+        file_url = "https://tiyrs98e90uelbs3.public.blob.vercel-storage.com/resume-OKXnr4Xt5PLwnqSpEo0WoWljdxI2Rh.pdf"
+        temp_dir = pathlib.Path(tempfile.gettempdir()) / "uploads"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+
+        file_name = pathlib.Path(file_url).name or "uploaded-file"
+        temp_file_path = temp_dir / file_name
+
+        print("Downloading file from:", file_url)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(file_url)
+            response.raise_for_status()
+            temp_file_path.write_bytes(response.content)
+
+
+        print("File used for set_input_files:", str(temp_file_path))
+
+        resume_field_input = await page.observe("find all <input type='file'> input for a pdf resume file")
+        print(f"Resume field input: {resume_field_input}")
+        first_resume_field_input = resume_field_input[0]
+        print(f"First resume field input: {first_resume_field_input}")
+        await page.set_input_files(
+            first_resume_field_input.selector,
+            str(temp_file_path)
+        )
+        print("File uploaded successfully")
+        actions = await page.observe(f"apply for the job offer with dummy data")
         print(f"Actions: {actions}")
-        for action in actions:
+        # Limit to first 5 actions to not complete the form on purpose
+        for action in actions[:5]:
             acted = await page.act(action)
             print(f"Acted: {acted}")
-
 
 
         print("\nClosing 🤘 Stagehand...")

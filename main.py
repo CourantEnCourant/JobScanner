@@ -124,7 +124,7 @@ def get_more_job_details(employer_name:str, result:str) -> str:
             # return the link after "Apply:"
             apply_link = line.split("   Apply: ")[-1].split("\n")[0]
             if apply_link:
-                return f"For more details about jobs at {employer_name}, please visit the application link: {apply_link}"
+                return f"For more details about jobs at {employer_name}, open link: {apply_link}"
             else:
                 return f"No application link found for employer: '{employer_name}'"
 

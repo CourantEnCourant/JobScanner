@@ -208,3 +208,6 @@ __marimo__/
 
 # pycharm files
 **/.idea
+
+# Mac files
+**/.DS_Store

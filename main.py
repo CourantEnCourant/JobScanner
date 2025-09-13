@@ -2,7 +2,10 @@ from fastmcp import FastMCP
 import boto3
 
 from pathlib import Path
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 mcp = FastMCP("Echo Server", port=3000, stateless_http=True, debug=True)
 

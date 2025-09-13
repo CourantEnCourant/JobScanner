@@ -7,6 +7,25 @@ from pathlib import Path
 mcp = FastMCP("Echo Server", port=3000, stateless_http=True, debug=True)
 
 
+@mcp.tool(description="Update user's professional information")
+async def update_user_info(user_info: str) -> str:
+    with open("user_info.txt", "w") as f:
+        try:
+            f.write(user_info)
+            return "Update success"
+        except Exception as e:
+            return f"Update failed with following exception: {e}"
+
+
+@mcp.tool(description="Read user's professional information")
+async def read_user_info() -> str:
+    with open("user_info.txt", "r") as f:
+        try:
+            return f.read()
+        except Exception as e:
+            return f"Reading failed with following exception: {e}"
+
+
 @mcp.tool(description="List all existing cv templates")
 async def list_templates() -> list[str] | str:
     try:

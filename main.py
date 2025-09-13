@@ -171,13 +171,22 @@ async def fill_application_form(url:str):
 
     print(f"Stagehand environment: {stagehand.env}")
 
+
+    from browserbase import Browserbase
+
+    bb = Browserbase(api_key=os.environ["BROWSERBASE_API_KEY"])
+
     # Always return the browser URL early since we're always in BROWSERBASE mode
     browser_url = f"https://www.browserbase.com/sessions/{stagehand.session_id}"
-    print(f"🌐 View your live browser: {browser_url}")
+
+    live_view_links = bb.sessions.debug(stagehand.session_id)
+    live_view_link = live_view_links.debuggerFullscreenUrl
+    print(f"`🔍 Live View Link: {live_view_link}")
+
 
     # Start the background task for filling the form
     asyncio.create_task(_fill_form_background(stagehand, url))
-    return f"Browser session started. View live browser: {browser_url}. Form filling continues in background."
+    return f"Browser session started. View live browser: {live_view_link}. Form filling continues in background. You MUST open this view on the canvas tool in an iframe. You must expose this link to the user {browser_url} as a text response"
 
 
 async def _fill_form_background(stagehand: Stagehand, url: str):
@@ -222,6 +231,10 @@ async def _fill_form_background(stagehand: Stagehand, url: str):
         for action in actions[:5]:
             acted = await page.act(action)
             print(f"Acted: {acted}")
+
+
+        # Sleep for 20 seconds so that the user can see the form filling
+        await asyncio.sleep(20)
 
 
         print("\nClosing 🤘 Stagehand...")

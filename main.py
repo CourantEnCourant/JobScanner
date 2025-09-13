@@ -5,12 +5,19 @@ from typing import Any
 import httpx
 import os
 from mcp.server.fastmcp import FastMCP
+from dotenv import load_dotenv
+from stagehand import StagehandConfig, Stagehand
+import boto3
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize FastMCP server
 mcp = FastMCP("jobscanner", port=3000, stateless_http=True, debug=True)
 
-entries = []
-
+# Global variables
+result = ""
+# entries = []
 
 @mcp.tool()
 async def search_jobs(query1: str, query2: str = "", query3: str="", location: str = "", country: str = "us", date_posted: str = "all", limit: int = 10) -> str:
@@ -79,6 +86,7 @@ async def search_jobs(query1: str, query2: str = "", query3: str="", location: s
                 jobs = jobs[:limit]
 
                 # Format results
+                global result
                 result = f"Found {len(jobs)} job(s) matching '{query}'"
                 if location:
                     result += f" in '{location}'"
@@ -91,9 +99,10 @@ async def search_jobs(query1: str, query2: str = "", query3: str="", location: s
                     job_country = job.get("job_country", "")
                     location_str = f"{job_city}, {job_country}" if job_city and job_country else job_city or job_country or "Location not specified"
                     job_description = job.get("job_description", "")[:200] + "..." if len(job.get("job_description", "")) > 200 else job.get("job_description", "")
+                    job_description = job_description.replace("\n", " ").strip()
                     job_url = job.get("job_apply_link", "No URL available")
 
-                    result += f"{i}. **{job_title}** at {employer_name}\n"
+                    result += f"{i}. {job_title} at {employer_name}\n"
                     result += f"   Location: {location_str}\n"
                     if job_description:
                         result += f"   Description: {job_description}\n"
@@ -107,19 +116,47 @@ async def search_jobs(query1: str, query2: str = "", query3: str="", location: s
     result += "If the query was too broad, consider using more specific keywords or adding a location. Also ask the user about their preferences or their personal background to refine the search."
     return result
 
-
 @mcp.tool()
-async def fetch_url(url: str) -> Any:
-    """Fetch the content of a URL."""
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url)
-            response.raise_for_status()
-            return response.text
-    except httpx.HTTPStatusError as e:
-        return f"HTTP Error: {e.response.status_code} - {e.response.text}"
-    except Exception as e:
-        return f"Error fetching URL: {str(e)}"
+def get_more_job_details(employer_name:str, result:str) -> str:
+    """
+    When user asks about a specific employer, must use this tool and must open the apply link.
+    Then you must open this page, scrape its content from the link, and summarize it to return to the user.
+    Parameters:
+    - employer_name: The name of the employer to get job details for.
+    - result: The job search results string from the previous search_jobs tool.
+    Returns: A string containing detailed job information for the specified employer.
+    Example: get_more_job_details("Google", result)
+    Note: Ensure to handle cases where the employer is not found in the results.
+    """
+    if not result:
+        return "Error: No job search results available. Please perform a job search first."
+    else:
+        print(f"Scraping job details for employer: {employer_name} from results.")
+
+    lines = result.split("\n\n")
+    for line in lines:
+        if employer_name.lower() in line.lower():
+            # return the link after "Apply:"
+            apply_link = line.split("   Apply: ")[-1].split("\n")[0]
+            if apply_link:
+                return f"For more details about jobs at {employer_name}, open link: {apply_link}"
+            else:
+                return f"No application link found for employer: '{employer_name}'"
+
+    return f"No job details found for employer: '{employer_name}'"
+
+# @mcp.tool()
+# async def fetch_url(url: str) -> Any:
+#     """Fetch the content of a URL."""
+#     try:
+#         async with httpx.AsyncClient() as client:
+#             response = await client.get(url)
+#             response.raise_for_status()
+#             return response.text
+#     except httpx.HTTPStatusError as e:
+#         return f"HTTP Error: {e.response.status_code} - {e.response.text}"
+#     except Exception as e:
+#         return f"Error fetching URL: {str(e)}"
 
 
 with open("prompt.txt", "r") as file:
@@ -132,22 +169,15 @@ async def main_prompt(user_input: str) -> str:
     return prompt
 
 
-@mcp.tool()
-async def add_job_application_entry(company_name:str, job_title:str) -> str:
-    entries.append((company_name, job_title))
-    return "Job application entry added successfully"
+# @mcp.tool()
+# async def add_job_application_entry(company_name:str, job_title:str) -> str:
+#     entries.append((company_name, job_title))
+#     return "Job application entry added successfully"
 
-@mcp.tool()
-async def get_job_application_entries() -> str:
-    """Get all job application entries as csv"""
-    return "company_name,job_title\n" + "\n".join([f"{company_name},{job_title}" for company_name, job_title in entries])
-
-
-
-from stagehand import StagehandConfig, Stagehand
-from dotenv import load_dotenv
-
-load_dotenv()
+# @mcp.tool()
+# async def get_job_application_entries() -> str:
+#     """Get all job application entries as csv"""
+#     return "company_name,job_title\n" + "\n".join([f"{company_name},{job_title}" for company_name, job_title in entries])
 
 @mcp.tool()
 async def fill_application_form(url:str):
@@ -171,51 +201,13 @@ async def fill_application_form(url:str):
 
     print(f"Stagehand environment: {stagehand.env}")
 
-
-    from browserbase import Browserbase
-
-    bb = Browserbase(api_key=os.environ["BROWSERBASE_API_KEY"])
-
     # Always return the browser URL early since we're always in BROWSERBASE mode
     browser_url = f"https://www.browserbase.com/sessions/{stagehand.session_id}"
-
-    live_view_links = bb.sessions.debug(stagehand.session_id)
-    live_view_link = live_view_links.debuggerFullscreenUrl
-    print(f"`🔍 Live View Link: {live_view_link}")
-
+    print(f"🌐 View your live browser: {browser_url}")
 
     # Start the background task for filling the form
     asyncio.create_task(_fill_form_background(stagehand, url))
-    return f"""
-Browser session started.
-{live_view_link}
-You MUST open this view on the canvas tool in an iframe for this LINK: {live_view_link}
-
-WRITE THIS CODE IN THE CANVAS TOOL:
-
-<iframe
-    id="browserbase-iframe"
-    src="{live_view_link}"
-    sandbox="allow-same-origin allow-scripts"
-    allow="clipboard-read; clipboard-write"
-    style="width: 100%; height: 80vh; border: none; pointer-events: none;"
-/>
-<div id="browserbase-iframe-fallback" style="display: none;">
-    The process of filling the form finished, you can check the replay <a href="{browser_url}">here</a>
-</div>
-<script>
-console.log("Browserbase iframe fallback script loaded");
-window.addEventListener("message", function (event) {{
-    if (event.data === "browserbase-disconnected") {{
-        console.log("Message received from iframe:", event.data);
-        document.getElementById("browserbase-iframe").style.display = "none";
-        document.getElementById("browserbase-iframe-fallback").style.display = "block";
-    }}
-}});
-</script>
-
-YOUR TEXT RESPONSE MUST MENTION : {browser_url}
-"""
+    return f"Browser session started. View live browser: {browser_url}. Form filling continues in background."
 
 
 async def _fill_form_background(stagehand: Stagehand, url: str):
@@ -249,25 +241,17 @@ async def _fill_form_background(stagehand: Stagehand, url: str):
         print(f"Resume field input: {resume_field_input}")
         first_resume_field_input = resume_field_input[0]
         print(f"First resume field input: {first_resume_field_input}")
-
-        # if xpath include "input":
-        if ("input" in first_resume_field_input.selector):
-            await page.set_input_files(
-                first_resume_field_input.selector,
-                str(temp_file_path)
-            )
-            print("File uploaded successfully")
-
+        await page.set_input_files(
+            first_resume_field_input.selector,
+            str(temp_file_path)
+        )
+        print("File uploaded successfully")
         actions = await page.observe(f"apply for the job offer with dummy data")
         print(f"Actions: {actions}")
         # Limit to first 5 actions to not complete the form on purpose
         for action in actions[:5]:
             acted = await page.act(action)
             print(f"Acted: {acted}")
-
-
-        # Sleep for 20 seconds so that the user can see the form filling
-        await asyncio.sleep(20)
 
 
         print("\nClosing 🤘 Stagehand...")
@@ -302,7 +286,7 @@ async def read_user_info() -> str:
             return f.read()
         except Exception as e:
             return f"Reading failed with following exception: {e}"
-import pathlib
+
 
 @mcp.tool(description="List all existing cv templates")
 async def list_templates() -> list[str] | str:
@@ -319,41 +303,30 @@ async def read_template(template_path: str) -> str:
         return f.read()
 
 
-import boto3
 
-@mcp.tool(description="Create a .tex file from LaTeX source, upload to AWS S3, and return Overleaf link for compilation")
-async def create_and_upload_tex(latex: str) -> str:
-    """
-    Combined function that creates a .tex file from LaTeX source and uploads it to get an Overleaf compilation link.
+@mcp.tool(description="Upload a .tex file on aws and return a overleaf link for manual compilation")
+async def upload_tex_then_compile_with_overleaf(file_path: str) -> str:
+    bucket_name = "mistral-mcp-hackathon"
+    local_file = file_path
+    object_name = pathlib.Path(local_file).name
 
-    Args:
-        latex (str): The LaTeX source code to create the .tex file from
-
-    Returns:
-        str: Overleaf compilation link if successful, error message otherwise
-    """
     try:
-        # First, create the .tex file
-        cv_path = pathlib.Path("./cv/cv.tex")
-        with open(cv_path, "w") as f:
-            f.write(latex)
-
-        # Then upload to S3 and get Overleaf link
-        bucket_name = "mistral-mcp-hackathon"
-        local_file = str(cv_path)
-        object_name = cv_path.name
-
         s3 = boto3.client("s3")
         s3.upload_file(local_file, bucket_name, object_name)
         tex_url = f"https://{bucket_name}.s3.eu-north-1.amazonaws.com/{object_name}"
         return f"https://www.overleaf.com/docs?snip_uri={tex_url}"
-
     except Exception as e:
-        return f"Failed to create and upload .tex file: {e}"
+        return f"An error occurred: {e}"
 
 
-
-
+@mcp.tool(description="Create a .tex file from the given LaTeX source and save it to ./cv/cv.tex")
+async def create_tex(latex: str) -> str:
+    try:
+        with open(pathlib.Path("./cv/cv.tex"), "w") as f:
+            f.write(latex)
+        return "Tex created successfully"
+    except Exception as e:
+        return f"Tex creation failed: {e}"
 
 if __name__ == "__main__":
     # Initialize and run the server

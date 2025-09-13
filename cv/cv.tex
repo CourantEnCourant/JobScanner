@@ -1,0 +1,188 @@
+%-------------------------
+% Resume in Latex for Jack Sparrow
+% Author : Le Chat
+% Based on: Cool Looking Template by Wilmer Gonzalez
+% License : MIT
+%-------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{pagecolor}
+\usepackage{lato}
+\usepackage{fontawesome}
+
+% Page styling
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Section formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{#1}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{8pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \vspace{1pt}
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubItem}[2]{\resumeItem{#1}{#2}\vspace{-4pt}}
+\renewcommand{\labelitemii}{$\circ$}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=*]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+\newcommand{\resumeTech}[2]{
+  \textbf{#1:} #2
+}
+
+% Dark theme
+\colorlet{textcolor}{white!80!gray}
+\colorlet{backgroundcolor}{black!30!gray}
+\colorlet{urlcolor}{blue!25!white}
+\AtBeginDocument{\color{textcolor}}
+
+% Document
+\begin{document}
+\pagecolor{backgroundcolor}
+
+% HEADING
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+  \textbf{\href{https://en.wikipedia.org/wiki/Jack_Sparrow}{\Large Captain Jack Sparrow}} & \faicon{ship} \color{urlcolor} The Black Pearl \\
+  \href{mailto:jack.sparrow@eitc.gov}{jack.sparrow@eitc.gov} & \faicon{compass} Navigator, Strategist \\
+  \textsl{\small \"The problem is not the problem. The problem is your attitude about the problem.\"} & \textsl{\small \href{https://en.wikipedia.org/wiki/Pirates_of_the_Caribbean}{Pirates of the Caribbean}}
+\end{tabular*}
+
+% EXPERIENCE
+\section{Experience}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {East India Trading Company}{Caribbean Sea}
+      {Freelance Consultant (Formerly Wanted)}{1720 - Present}
+      \resumeItemListStart
+        \resumeItem{Outmaneuvered the British Royal Navy and Davy Jones to regain control of the \textbf{Black Pearl}, demonstrating unparalleled negotiation and tactical skills.}
+        \resumeItem{Recruited and led a diverse crew of misfits, proving expertise in team management under extreme conditions.}
+        \resumeItem{Navigated uncharted waters using only a broken compass, showcasing adaptability and resourcefulness.}
+      \resumeItemListEnd
+      \resumeTech{Skills}{Swordsmanship, Cartography, Rum Tasting, Escape Artistry.}
+
+    \resumeSubheading
+      {Pirate Lord of the Caribbean}{Tortuga, Caribbean}
+      {Self-Employed}{1710 - Present}
+      \resumeItemListStart
+        \resumeItem{Acquired and lost the \textbf{Black Pearl} multiple times, demonstrating resilience and persistence.}
+        \resumeItem{Negotiated with supernatural entities, including Davy Jones and Calypso, to secure favorable outcomes.}
+        \resumeItem{Developed a reputation for \"creative interpretations\" of the Pirate Code, emphasizing flexibility in legal frameworks.}
+      \resumeItemListEnd
+      \resumeTech{Tools}{Compass (mysteriously points to what you want most), Pistols, Rum.}
+
+    \resumeSubheading
+      {The Flying Dutchman}{Seven Seas}
+      {Temporary Crew Member}{1729 - 1729}
+      \resumeItemListStart
+        \resumeItem{Briefly served under Davy Jones to settle a debt, gaining firsthand experience in cursed naval operations.}
+        \resumeItem{Played a key role in the mutiny against Davy Jones, leading to his eventual freedom.}
+      \resumeItemListEnd
+      \resumeTech{Skills}{Survival, Crisis Management, Kraken Evasion.}
+
+    \resumeSubheading
+      {Port Royal Governor's Office}{Port Royal, Jamaica}
+      {Consultant (Unofficial)}{1725 - 1728}
+      \resumeItemListStart
+        \resumeItem{Assisted in the rescue of Elizabeth Swann from cursed Aztec gold, proving expertise in risk assessment.}
+        \resumeItem{Escaped execution through a combination of wit, luck, and a well-timed lunar eclipse.}
+      \resumeItemListEnd
+      \resumeTech{Achievements}{Avoided hanging, acquired eternal fame.}
+
+\resumeSubHeadingListEnd
+
+% EDUCATION
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {School of Hard Knocks}{Caribbean Sea}
+      {Master of Pirate Arts}{Self-Taught}
+      \resumeItemListStart
+        \resumeItem{Studied under legendary pirates, including Captain Teague (allegedly).}
+        \resumeItem{Specialized in improvisation, deception, and rum-based diplomacy.}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+% SKILLS
+\section{Skills}
+  \resumeSubHeadingListStart
+    \resumeSubItem{\textbf{Navigation:} Expert in celestial navigation, dead reckoning, and \"going where the wind takes me.\"}
+    \resumeSubItem{\textbf{Languages:} Fluent in English, Pirate, and sarcasm.}
+    \resumeSubItem{\textbf{Combat:} Proficient in swordplay, hand-to-hand combat, and dramatic escapes.}
+    \resumeSubItem{\textbf{Leadership:} Inspired loyalty in crews through charisma and questionable promises.}
+  \resumeSubHeadingListEnd
+
+% CERTIFICATIONS
+\section{Certifications}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Brethren Court}{Shipwreck Cove}
+      {\href{https://en.wikipedia.org/wiki/Pirate_lord}{Pirate Lord}}{1750}
+    \resumeSubheading
+      {Royal Navy}{Port Royal}
+      {\href{https://en.wikipedia.org/wiki/Letter_of_marque}{Letter of Marque (Revocable)}}{1718}
+  \resumeSubHeadingListEnd
+
+% NOTABLE ACHIEVEMENTS
+\section{Notable Achievements}
+  \resumeSubHeadingListStart
+    \resumeSubItem{Stole the \textbf{Black Pearl} from Captain Hector Barbossa using only a small boat and sheer audacity.}
+    \resumeSubItem{Survived the \textbf{Kraken}, the \textbf{Flying Dutchman}, and multiple hangings.}
+    \resumeSubItem{Discovered the \textbf{Fountain of Youth} (but lost the map).}
+    \resumeSubItem{Star of the \textbf{Pirates of the Caribbean} franchise (unpaid).}
+  \resumeSubHeadingListEnd
+
+% REFERENCES
+\section{References}
+  \resumeSubHeadingListStart
+    \resumeSubItem{\textbf{Captain Hector Barbossa} - \"He's a dreadful pirate, but you'd be surprised how often he escapes.\"}
+    \resumeSubItem{\textbf{Elizabeth Swann} - \"Complicated, but effective.\"}
+    \resumeSubItem{\textbf{Will Turner} - \"I owe him a ship.\"}
+  \resumeSubHeadingListEnd
+
+\end{document}

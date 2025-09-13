@@ -321,31 +321,6 @@ async def read_template(template_path: str) -> str:
 
 import boto3
 
-@mcp.tool(description="Upload a .tex file on aws and return a overleaf link for manual compilation")
-async def upload_tex_then_compile_with_overleaf(file_path: str) -> str:
-    bucket_name = "mistral-mcp-hackathon"
-    local_file = file_path
-    object_name = pathlib.Path(local_file).name
-
-    try:
-        s3 = boto3.client("s3")
-        s3.upload_file(local_file, bucket_name, object_name)
-        tex_url = f"https://{bucket_name}.s3.eu-north-1.amazonaws.com/{object_name}"
-        return f"https://www.overleaf.com/docs?snip_uri={tex_url}"
-    except Exception as e:
-        return f"An error occurred: {e}"
-
-
-@mcp.tool(description="Create a .tex file from the given LaTeX source and save it to ./cv/cv.tex")
-async def create_tex(latex: str) -> str:
-    try:
-        with open(pathlib.Path("./cv/cv.tex"), "w") as f:
-            f.write(latex)
-        return "Tex created successfully"
-    except Exception as e:
-        return f"Tex creation failed: {e}"
-
-
 @mcp.tool(description="Create a .tex file from LaTeX source, upload to AWS S3, and return Overleaf link for compilation")
 async def create_and_upload_tex(latex: str) -> str:
     """

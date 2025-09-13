@@ -99,6 +99,7 @@ async def search_jobs(query1: str, query2: str = "", query3: str="", location: s
                     job_country = job.get("job_country", "")
                     location_str = f"{job_city}, {job_country}" if job_city and job_country else job_city or job_country or "Location not specified"
                     job_description = job.get("job_description", "")[:200] + "..." if len(job.get("job_description", "")) > 200 else job.get("job_description", "")
+                    job_description = job_description.replace("\n", " ").strip()
                     job_url = job.get("job_apply_link", "No URL available")
 
                     result += f"{i}. {job_title} at {employer_name}\n"

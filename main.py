@@ -343,7 +343,11 @@ async def create_and_upload_tex(latex: str) -> str:
         local_file = str(cv_path)
         object_name = cv_path.name
 
-        s3 = boto3.client("s3")
+        s3 = boto3.client("s3",    
+            aws_access_key_id=os.getenv("S3_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("S3_SECRET_ACCESS_KEY")
+        )
+
         s3.upload_file(local_file, bucket_name, object_name)
         tex_url = f"https://{bucket_name}.s3.eu-north-1.amazonaws.com/{object_name}"
         return f"https://www.overleaf.com/docs?snip_uri={tex_url}"

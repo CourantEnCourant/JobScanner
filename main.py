@@ -109,24 +109,6 @@ async def search_jobs(query1: str, query2: str = "", query3: str="", location: s
 
 
 @mcp.tool()
-async def display_templates() -> str:
-    """Display available CV templates.
-    Always call this tool when the user wants to create or modify a CV."""
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get("http://localhost:8080/templates")
-            response.raise_for_status()
-            images = response.json()
-            return "\n".join(images)
-    except httpx.HTTPStatusError as e:
-        return f"HTTP Error: {e.response.status_code} - {e.response.text}"
-    except Exception as e:
-        return f"Error fetching templates: {str(e)}"
-    #response = await requests.get("http://localhost:8080/templates")
-    #return " ".join(response)
-
-
-@mcp.tool()
 async def fetch_url(url: str) -> Any:
     """Fetch the content of a URL."""
     try:
@@ -311,7 +293,7 @@ async def upload_tex_then_compile_with_overleaf(file_path: str) -> str:
 @mcp.tool(description="Create a .tex file from the given LaTeX source and save it to ./cv/cv.tex")
 async def create_tex(latex: str) -> str:
     try:
-        with open(Path("./cv/cv.tex"), "w") as f:
+        with open(pathlib.Path("./cv/cv.tex"), "w") as f:
             f.write(latex)
         return "Tex created successfully"
     except Exception as e:

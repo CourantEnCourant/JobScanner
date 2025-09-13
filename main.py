@@ -186,7 +186,23 @@ async def fill_application_form(url:str):
 
     # Start the background task for filling the form
     asyncio.create_task(_fill_form_background(stagehand, url))
-    return f"Browser session started. View live browser: {live_view_link}. Form filling continues in background. You MUST open this view on the canvas tool in an iframe. You must expose this link to the user {browser_url} as a text response"
+    return f"""
+Browser session started.
+{live_view_link}
+You MUST open this view on the canvas tool in an iframe for this LINK: {live_view_link}
+
+WRITE THIS CODE IN THE CANVAS TOOL:
+
+<iframe
+src="{live_view_link}"
+sandbox="allow-same-origin allow-scripts"
+allow="clipboard-read; clipboard-write"
+style="width: 100%; height: 80vh; border: none; pointer-events: none;"
+/>
+</div>
+
+YOUR TEXT RESPONSE MUST MENTION : {browser_url}
+"""
 
 
 async def _fill_form_background(stagehand: Stagehand, url: str):

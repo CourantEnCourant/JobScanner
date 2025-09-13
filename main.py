@@ -98,9 +98,10 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
         return f"Error searching jobs: {str(e)}"
 
 @mcp.tool()
-def get_more_job_details(employer_name:str, result:str) -> str:
+def get_more_job_details_(employer_name:str, result:str) -> str:
     """
-    When user asks for more details about a specific employer, use this tool to scrape detailed job information from the provided job search results for a specific employer.
+    When user asks for more details about a specific employer, must use this tool to scrape detailed job information from the provided job search results for a specific employer.
+    Always use this tool when user asks for more details about a specific employer.
     Parameters:
     - employer_name: The name of the employer to filter job details.
     - result: The job search results string to scrape details from.

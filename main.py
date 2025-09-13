@@ -8,11 +8,6 @@ from dotenv import load_dotenv
 from io import StringIO
 import logging
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
-
 # Load environment variables from .env file
 load_dotenv()
 
@@ -88,15 +83,16 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
                 job_country = job.get("job_country", "")
                 location_str = f"{job_city}, {job_country}" if job_city and job_country else job_city or job_country or "Location not specified"
                 job_description = job.get("job_description", "")[:200] + "..." if len(job.get("job_description", "")) > 200 else job.get("job_description", "")
+                job_description = job_description.replace("\n", " ").strip()
                 job_url = job.get("job_apply_link", "No URL available")
 
                 result += f"{i}. **{job_title}** at {employer_name}\n"
                 result += f"   Location: {location_str}\n"
                 if job_description:
                     result += f"   Description: {job_description}\n"
-                result += f"   Apply: {job_url}\n\n\n"
+                result += f"   Apply: {job_url}\n\n"
 
-            logging.debug(f"{result}")
+            # print(f"{result}")
             return result
 
     except httpx.HTTPStatusError as e:
@@ -104,33 +100,33 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
     except Exception as e:
         return f"Error searching jobs: {str(e)}"
 
+
 @mcp.tool()
 def get_more_job_details(employer_name:str, result:str) -> str:
     """
-    When user asks about a specific employer, must use this tool to scrape detailed job information from the provided job search results for a specific employer.
-    Always use this tool when user asks for more details about a specific employer.
+    When user asks about a specific employer, must use this tool and must open the apply link.
+    Then you must open this page, scrape its content from the link, and summarize it to return to the user.
     Parameters:
-    - employer_name: The name of the employer to filter job details.
-    - result: The job search results string to scrape details from.
-    Returns: A formatted string containing detailed job information for the specified employer.
-    1. Parse the job search results to find jobs related to the specified employer.
-    2. Scrape additional details such as job description, requirements, and salary from the application link.
-    3. Return the detailed job information as a string.
-    Example: scrape_job_details("Google", result)
-    Note: Ensure to handle cases where no jobs are found for the specified employer.
+    - employer_name: The name of the employer to get job details for.
+    - result: The job search results string from the previous search_jobs tool.
+    Returns: A string containing detailed job information for the specified employer.
+    Example: get_more_job_details("Google", result)
+    Note: Ensure to handle cases where the employer is not found in the results.
     """
     if not result:
         return "Error: No job search results available. Please perform a job search first."
     else:
-        logging.debug(f"Scraping job details for employer: {employer_name} from results.")
-    lines = result.split("\n\n\n")
+        print(f"Scraping job details for employer: {employer_name} from results.")
 
+    lines = result.split("\n\n")
     for line in lines:
         if employer_name.lower() in line.lower():
             # return the link after "Apply:"
-            apply_link = line.split("Apply:")[-1].strip()
-            logging.debug(f"Found job details for {employer_name}: {apply_link}")
-            return f"Job details for {employer_name}:\n at: {apply_link}"
+            apply_link = line.split("   Apply: ")[-1].split("\n")[0]
+            if apply_link:
+                return f"For more details about jobs at {employer_name}, please visit the application link: {apply_link}"
+            else:
+                return f"No application link found for employer: '{employer_name}'"
 
     return f"No job details found for employer: '{employer_name}'"
 

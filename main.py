@@ -70,6 +70,7 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
             jobs = jobs[:limit]
 
             # Format results
+            global result
             result = f"Found {len(jobs)} job(s) matching '{query}'"
             if location:
                 result += f" in '{location}'"
@@ -113,6 +114,10 @@ def get_more_job_details(employer_name:str, result:str) -> str:
     Example: scrape_job_details("Google", result)
     Note: Ensure to handle cases where no jobs are found for the specified employer.
     """
+    if not result:
+        return "Error: No job search results available. Please perform a job search first."
+    else:
+        logging.info(f"Scraping job details for employer: {employer_name} from results.")
     lines = result.split("\n\n\n")
 
     for line in lines:

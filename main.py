@@ -168,7 +168,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 @mcp.tool()
-async def fill_applcation_form(url:str):
+async def fill_application_form(url:str):
     """
     Fill the application form for the given URL
     """

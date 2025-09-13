@@ -6,6 +6,7 @@
 
     - `fetch_url`: Fetch data from a URL
     - `search_jobs`: Search for jobs
+    - `display_templates`: Get previews of Latex CV templates
 
     # Instructions
 

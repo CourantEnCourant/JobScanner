@@ -346,6 +346,37 @@ async def create_tex(latex: str) -> str:
         return f"Tex creation failed: {e}"
 
 
+@mcp.tool(description="Create a .tex file from LaTeX source, upload to AWS S3, and return Overleaf link for compilation")
+async def create_and_upload_tex(latex: str) -> str:
+    """
+    Combined function that creates a .tex file from LaTeX source and uploads it to get an Overleaf compilation link.
+
+    Args:
+        latex (str): The LaTeX source code to create the .tex file from
+
+    Returns:
+        str: Overleaf compilation link if successful, error message otherwise
+    """
+    try:
+        # First, create the .tex file
+        cv_path = pathlib.Path("./cv/cv.tex")
+        with open(cv_path, "w") as f:
+            f.write(latex)
+
+        # Then upload to S3 and get Overleaf link
+        bucket_name = "mistral-mcp-hackathon"
+        local_file = str(cv_path)
+        object_name = cv_path.name
+
+        s3 = boto3.client("s3")
+        s3.upload_file(local_file, bucket_name, object_name)
+        tex_url = f"https://{bucket_name}.s3.eu-north-1.amazonaws.com/{object_name}"
+        return f"https://www.overleaf.com/docs?snip_uri={tex_url}"
+
+    except Exception as e:
+        return f"Failed to create and upload .tex file: {e}"
+
+
 
 
 

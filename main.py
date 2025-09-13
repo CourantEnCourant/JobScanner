@@ -2,12 +2,13 @@ from fastmcp import FastMCP
 import boto3
 
 from pathlib import Path
-import os
+
 
 mcp = FastMCP("Echo Server", port=3000, stateless_http=True, debug=True)
 
-@mcp.tool(description="Upload a file on aws and give a link to the user")
-def send_file(file_path: str) -> str:
+
+@mcp.tool(description="Upload a .tex file on aws and return a overleaf link for compilation")
+def upload_tex_send_compile_with_overleaf(file_path: str) -> str:
     bucket_name = "mistral-mcp-hackathon"
     local_file = file_path
     object_name = Path(local_file).name
@@ -15,9 +16,11 @@ def send_file(file_path: str) -> str:
     try:
         s3 = boto3.client("s3")
         s3.upload_file(local_file, bucket_name, object_name)
-        return f"https://{bucket_name}.s3.eu-north-1.amazonaws.com/{object_name}"
+        tex_url = f"https://{bucket_name}.s3.eu-north-1.amazonaws.com/{object_name}"
+        return f"https://www.overleaf.com/docs?snip_uri={tex_url}"
     except Exception as e:
         return f"An error occurred: {e}"
+
 
 @mcp.tool(description="Create a .tex file from the given LaTeX source and save it to ./cv/cv.tex")
 def create_tex(latex: str) -> str:

@@ -6,6 +6,7 @@ import json
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 from io import StringIO
+import logging
 
 # Load environment variables from .env file
 load_dotenv()
@@ -89,7 +90,7 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
                     result += f"   Description: {job_description}\n"
                 result += f"   Apply: {job_url}\n\n\n"
 
-            print(result)
+            logging.info(f"{result}")
             return result
 
     except httpx.HTTPStatusError as e:
@@ -98,9 +99,9 @@ async def search_jobs(query: str, location: str = "", country: str = "us", date_
         return f"Error searching jobs: {str(e)}"
 
 @mcp.tool()
-def get_more_job_details_(employer_name:str, result:str) -> str:
+def get_more_job_details(employer_name:str, result:str) -> str:
     """
-    When user asks for more details about a specific employer, must use this tool to scrape detailed job information from the provided job search results for a specific employer.
+    When user asks about a specific employer, must use this tool to scrape detailed job information from the provided job search results for a specific employer.
     Always use this tool when user asks for more details about a specific employer.
     Parameters:
     - employer_name: The name of the employer to filter job details.
@@ -118,7 +119,7 @@ def get_more_job_details_(employer_name:str, result:str) -> str:
         if employer_name.lower() in line.lower():
             # return the link after "Apply:"
             apply_link = line.split("Apply:")[-1].strip()
-            print(f"Found job details for {employer_name}: {apply_link}")
+            logging.info(f"Found job details for {employer_name}: {apply_link}")
             return f"Job details for {employer_name}:\n at: {apply_link}"
 
     return f"No job details found for employer: '{employer_name}'"

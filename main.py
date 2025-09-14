@@ -13,7 +13,7 @@ import boto3
 load_dotenv()
 
 # Initialize FastMCP server
-mcp = FastMCP("jobscanner", port=3000, stateless_http=True, debug=True)
+mcp = FastMCP("jobscanner", port=3000, stateless_http=True, debug=True, host="0.0.0.0")
 
 # Global variables
 result = ""

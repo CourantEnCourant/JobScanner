@@ -193,7 +193,7 @@ async def fill_application_form(url:str):
         model_api_key=os.getenv("MODEL_API_KEY"),
     )
 
-    stagehand = Stagehand(config)
+    stagehand = Stagehand(config, server_url="https://api.stagehand.browserbase.com/v1")
 
     print("\nInitializing 🤘 Stagehand...")
     # Initialize Stagehand

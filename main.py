@@ -319,32 +319,28 @@ async def _fill_form_background(stagehand: Stagehand, url: str):
             pass
 
 
-
-
-@mcp.tool(description="Update user's professional information")
-async def update_user_info(user_info: str) -> str:
-    with open("user_info.txt", "w") as f:
-        try:
-            f.write(user_info)
-            return "Update success"
-        except Exception as e:
-            return f"Update failed with following exception: {e}"
-
-
-@mcp.tool(description="Read user's professional information")
-async def read_user_info() -> str:
-    with open("user_info.txt", "r") as f:
-        try:
-            return f.read()
-        except Exception as e:
-            return f"Reading failed with following exception: {e}"
-
-
-@mcp.tool(description="List all existing cv templates")
-async def list_templates() -> list[str] | str:
+@mcp.tool()
+async def list_cv_templates() -> list[str]:
+    """
+    List all available CV templates.
+    """
     try:
         template_dir = pathlib.Path(__file__).parent / "cv_templates"
         return [str(p) for p in template_dir.glob("*.tex")]
+    except Exception as e:
+        return f"An error occurred: {e}"
+
+
+@mcp.tool()
+async def get_cover_letter_template() -> str:
+    """
+    Get the cover letter LaTeX template. Use this tool if the users do not have their own cover letter template.
+    Always use this template to generate a cover letter. Then, open it with `create_overleaf_link_for_latex`.
+    """
+    try:
+        template = pathlib.Path(__file__).parent / "cover_letter_templates" / "cover_letter_template.tex"
+        with open(template, 'r') as f:
+            return f.read()
     except Exception as e:
         return f"An error occurred: {e}"
 
@@ -355,32 +351,13 @@ async def read_template(template_path: str) -> str:
         return f.read()
 
 
-
-"""
-@mcp.tool(description="Upload a .tex file on aws and return a overleaf link for manual compilation")
-async def upload_tex_then_compile_with_overleaf(file_path: str) -> str:
-    bucket_name = "mistral-mcp-hackathon"
-    local_file = file_path
-    object_name = pathlib.Path(local_file).name
-
-    try:
-        s3 = boto3.client("s3")
-        s3.upload_file(local_file, bucket_name, object_name)
-        tex_url = f"https://{bucket_name}.s3.eu-north-1.amazonaws.com/{object_name}"
-        print(tex_url)
-        return f"https://www.overleaf.com/docs?snip_uri={tex_url}"
-    except Exception as e:
-        return f"An error occurred: {e}"file_path
-"""
-
-
 @mcp.tool()#description="Create a .tex file from the given LaTeX source and save it to ./cv/cv.tex")
-async def create_overleaf_link_from_cv(latex: str) -> str:
+async def create_overleaf_link_for_latex(latex: str) -> str:
     """
-    Create an overleaf link from a CV in latex format in order to compile it and generate a PDF.
+    Create an overleaf link from a CV or a cover letter in latex format in order to compile it and generate a PDF.
 
     Args:
-        latex (str): the latex content of a CV.
+        latex (str): the latex content of a CV or a cover letter
 
     Returns:
         An overleaf link (str)
@@ -402,9 +379,6 @@ async def create_overleaf_link_from_cv(latex: str) -> str:
         return f"https://www.overleaf.com/docs?snip_uri={tex_url}"
     except Exception as e:
         return f"An error occurred: {e}"
-
-
-
 
 
 if __name__ == "__main__":

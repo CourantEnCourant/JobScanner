@@ -191,7 +191,7 @@ async def fill_application_form(url:str):
     """
 
     # if url is not job.lever.com its not supported
-    if ("job.lever.com" not in url):
+    if ("lever" not in url):
         return "Error: This URL is not supported. This tool can only be used for job.lever.com URLs."
 
       # Create configuration - always use BROWSERBASE mode

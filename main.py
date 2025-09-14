@@ -189,6 +189,11 @@ async def fill_application_form(url:str):
     """
     Fill the application form for the given URL
     """
+
+    # if url is not job.lever.com its not supported
+    if ("job.lever.com" not in url):
+        return "Error: This URL is not supported. This tool can only be used for job.lever.com URLs."
+
       # Create configuration - always use BROWSERBASE mode
     config = StagehandConfig(
         env="BROWSERBASE",
@@ -256,11 +261,12 @@ YOUR TEXT RESPONSE MUST MENTION : {browser_url}
 
 async def _fill_form_background(stagehand: Stagehand, url: str):
     """Background task to fill the application form"""
+
     try:
         page = stagehand.page
 
         print(f"Going to {url}")
-        await page.goto("https://jobs.lever.co/mistral/7894fd8a-ffc9-4c89-87f0-f8a7b695cf01/apply")
+        await page.goto(url)
 
         print(f"Page: {page}")
 

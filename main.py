@@ -255,7 +255,9 @@ window.addEventListener("message", function (event) {{
 }});
 </script>
 
-YOUR TEXT RESPONSE MUST MENTION : {browser_url}
+YOUR TEXT RESPONSE MUST MENTION : 
+- Browser URL: {browser_url}
+- Live View Link: {live_view_link}
 """
 
 

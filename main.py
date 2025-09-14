@@ -179,6 +179,11 @@ async def main_prompt(user_input: str) -> str:
 #     """Get all job application entries as csv"""
 #     return "company_name,job_title\n" + "\n".join([f"{company_name},{job_title}" for company_name, job_title in entries])
 
+from stagehand import StagehandConfig, Stagehand
+from dotenv import load_dotenv
+
+load_dotenv()
+
 @mcp.tool()
 async def fill_application_form(url:str):
     """
@@ -199,15 +204,54 @@ async def fill_application_form(url:str):
     # Initialize Stagehand
     await stagehand.init()
 
-    print(f"Stagehand environment: {stagehand.env}")
+    print(f"Stagehand environment: {stagehand.config.env}")
+
+
+    from browserbase import Browserbase
+
+    bb = Browserbase(api_key=os.environ["BROWSERBASE_API_KEY"])
 
     # Always return the browser URL early since we're always in BROWSERBASE mode
     browser_url = f"https://www.browserbase.com/sessions/{stagehand.session_id}"
-    print(f"🌐 View your live browser: {browser_url}")
+
+    live_view_links = bb.sessions.debug(stagehand.session_id)
+    live_view_link = live_view_links.debuggerFullscreenUrl
+    print(f"`🔍 Live View Link: {live_view_link}")
+    print(f"Browser URL: {browser_url}")
+
 
     # Start the background task for filling the form
     asyncio.create_task(_fill_form_background(stagehand, url))
-    return f"Browser session started. View live browser: {browser_url}. Form filling continues in background."
+    return f"""
+Browser session started.
+{live_view_link}
+You MUST open this view on the canvas tool in an iframe for this LINK: {live_view_link}
+
+WRITE THIS CODE IN THE CANVAS TOOL:
+
+<iframe
+    id="browserbase-iframe"
+    src="{live_view_link}"
+    sandbox="allow-same-origin allow-scripts"
+    allow="clipboard-read; clipboard-write"
+    style="width: 100%; height: 80vh; border: none; pointer-events: none;"
+/>
+<div id="browserbase-iframe-fallback" style="display: none;">
+    The process of filling the form finished, you can check the replay <a href="{browser_url}">here</a>
+</div>
+<script>
+console.log("Browserbase iframe fallback script loaded");
+window.addEventListener("message", function (event) {{
+    if (event.data === "browserbase-disconnected") {{
+        console.log("Message received from iframe:", event.data);
+        document.getElementById("browserbase-iframe").style.display = "none";
+        document.getElementById("browserbase-iframe-fallback").style.display = "block";
+    }}
+}});
+</script>
+
+YOUR TEXT RESPONSE MUST MENTION : {browser_url}
+"""
 
 
 async def _fill_form_background(stagehand: Stagehand, url: str):
@@ -241,17 +285,25 @@ async def _fill_form_background(stagehand: Stagehand, url: str):
         print(f"Resume field input: {resume_field_input}")
         first_resume_field_input = resume_field_input[0]
         print(f"First resume field input: {first_resume_field_input}")
-        await page.set_input_files(
-            first_resume_field_input.selector,
-            str(temp_file_path)
-        )
-        print("File uploaded successfully")
+
+        # if xpath include "input":
+        if ("input" in first_resume_field_input.selector):
+            await page.set_input_files(
+                first_resume_field_input.selector,
+                str(temp_file_path)
+            )
+            print("File uploaded successfully")
+
         actions = await page.observe(f"apply for the job offer with dummy data")
         print(f"Actions: {actions}")
         # Limit to first 5 actions to not complete the form on purpose
         for action in actions[:5]:
             acted = await page.act(action)
             print(f"Acted: {acted}")
+
+
+        # Sleep for 20 seconds so that the user can see the form filling
+        await asyncio.sleep(20)
 
 
         print("\nClosing 🤘 Stagehand...")
